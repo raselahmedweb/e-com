@@ -24,6 +24,7 @@ const loginSchema = z.object({
 
 // Set JWT token in cookies
 async function setAuthCookie(userId: number, name: string, email: string, isAdmin: boolean) {
+  const cookiesStore = await cookies();
   const token = await new SignJWT({
     id: userId,
     name,
@@ -35,7 +36,7 @@ async function setAuthCookie(userId: number, name: string, email: string, isAdmi
     .setExpirationTime("7d")
     .sign(JWT_SECRET)
 
-  cookies().set("auth_token", token, {
+  cookiesStore.set("auth_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 7, // 7 days
@@ -118,13 +119,15 @@ export async function login(formData: FormData) {
 
 // Logout user
 export async function logout() {
-  cookies().delete("auth_token")
+    const cookiesStore = await cookies();
+  cookiesStore.delete("auth_token")
   redirect("/")
 }
 
 // Get current user from JWT token
 export async function getCurrentUser() {
-  const token = cookies().get("auth_token")?.value
+    const cookiesStore = await cookies();
+  const token = cookiesStore.get("auth_token")?.value
 
   if (!token) {
     return null
@@ -142,7 +145,7 @@ export async function getCurrentUser() {
   } catch (error) {
     // Invalid token
     console.error("JWT verification error:", error)
-    cookies().delete("auth_token")
+    cookiesStore.delete("auth_token")
     return null
   }
 }

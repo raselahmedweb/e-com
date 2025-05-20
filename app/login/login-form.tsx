@@ -1,47 +1,47 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { login } from "@/app/auth/actions"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { login } from "@/app/auth/actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export function LoginForm() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsLoading(true)
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
     try {
-      const formData = new FormData()
-      formData.append("email", email)
-      formData.append("password", password)
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
 
-      const result = await login(formData)
-
+      const result = await login(formData);
+      console.log(result, email);
       if (result.success) {
-        router.push("/account")
-        router.refresh()
+        router.push("/account");
+        router.refresh();
       } else {
-        setError(result.error || "Login failed")
+        setError(result.error || "Login failed");
       }
     } catch (err) {
-      setError("An unexpected error occurred")
+      setError("An unexpected error occurred");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="grid gap-6">
@@ -68,7 +68,10 @@ export function LoginForm() {
           <div className="grid gap-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" className="text-sm text-muted-foreground hover:text-primary">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-muted-foreground hover:text-primary"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -87,7 +90,7 @@ export function LoginForm() {
         </div>
       </form>
     </div>
-  )
+  );
 }
 
-import Link from "next/link"
+import Link from "next/link";

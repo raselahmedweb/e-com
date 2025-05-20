@@ -29,7 +29,7 @@ const productSchema = z.object({
 type ProductFormValues = z.infer<typeof productSchema>
 
 interface ProductFormProps {
-  categories: { id: number; name: string }[]
+  categories?: { id?: number; name?: string }[]
   product?: ProductFormValues & { id: number }
 }
 

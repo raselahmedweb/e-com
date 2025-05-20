@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless"
+  import { neon } from "@neondatabase/serverless"
 import { drizzle } from "drizzle-orm/neon-http"
 import { cookies } from "next/headers"
 
@@ -20,7 +20,7 @@ export async function executeQuery(query: string, params: any[] = []) {
     }
 
     // Use the sql tagged template function
-    return await sql.unsafe(preparedQuery, values)
+    return await sql.unsafe(preparedQuery)
   } catch (error) {
     console.error("Database query error:", error)
     throw error
@@ -255,25 +255,41 @@ export async function addUserAddress(
   `
 }
 
-// Generate a unique session ID
-function generateSessionId() {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+function generateSessionId(): string {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
 }
 
-// Get the current session ID from cookies or create a new one
-export function getSessionId() {
-  const cookieStore = cookies()
-  let sessionId = cookieStore.get("sessionId")?.value
+// Get or create session ID
+export async function getSessionId() {
+  try {
+    // Get the cookie store
+    const cookieStore = await cookies();
+    
+    // Try to get existing session ID
+    const existingCookie = cookieStore.get('sessionId');
+    const sessionId = existingCookie?.value;
 
-  if (!sessionId) {
-    sessionId = generateSessionId()
-    cookieStore.set("sessionId", sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: "/",
-    })
+    if (!sessionId) {
+      // Generate new session ID
+      const newSessionId = generateSessionId();
+      
+      // Set the new cookie
+      cookieStore.set('sessionId', newSessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: '/',
+        sameSite: 'lax'
+      });
+      
+      return newSessionId;
+    }
+
+    return sessionId;
+  } catch (error) {
+    console.error("Error handling session ID:", error);
+    // Fallback to generating a new ID if cookie operations fail
+    return generateSessionId();
   }
-
-  return sessionId
 }

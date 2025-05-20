@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart } from "lucide-react"
+import { addToCart } from "@/lib/db"
 
 // Mock product data for preview
 const product = {
@@ -80,7 +81,7 @@ export default function ProductPage() {
           </div>
 
           <div className="mt-6 flex flex-col gap-4">
-            <Button className="w-full" disabled={stock_quantity <= 0}>
+            <Button className="w-full" onClick={()=> addToCart()} disabled={stock_quantity <= 0}>
               <ShoppingCart className="mr-2 h-4 w-4" />
               Add to Cart
             </Button>

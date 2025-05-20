@@ -2,8 +2,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
-import { sql } from "@neondatabase/serverless"
 import { DeleteCategoryButton } from "./delete-category-button"
+
+import { neon } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-http"
+
+// Initialize the SQL client
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql)
 
 async function getCategories() {
   return sql`

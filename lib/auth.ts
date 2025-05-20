@@ -8,8 +8,8 @@ export function generateSessionId() {
 }
 
 // Get the current session ID from cookies or create a new one
-export function getSessionId() {
-  const cookieStore = cookies()
+export async function getSessionId() {
+  const cookieStore = await cookies()
   let sessionId = cookieStore.get("sessionId")?.value
 
   if (!sessionId) {

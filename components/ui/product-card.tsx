@@ -5,12 +5,12 @@ interface ProductCardProps {
   product: {
     id: number
     name: string
-    slug: string
+    slug?: string
     price: number
-    sale_price: number | null
-    image_url: string
-    category_name: string
-    category_slug: string
+    sale_price?: number | null
+    image_url?: string
+    category_name?: string
+    category_slug?: string
   }
 }
 

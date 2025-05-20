@@ -1,6 +1,11 @@
 import Link from "next/link"
 import { formatCurrency } from "@/lib/utils"
-import { sql } from "@neondatabase/serverless"
+  import { neon } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-http"
+
+// Initialize the SQL client
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql)
 
 async function getOrders() {
   return sql`

@@ -1,7 +1,12 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { sql } from "@neondatabase/serverless"
+  import { neon } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-http"
+
+// Initialize the SQL client
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql)
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/app/auth/actions"
 

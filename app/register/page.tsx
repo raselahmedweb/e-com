@@ -1,7 +1,5 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { RegisterForm } from "./register-form"
 
 export default function RegisterPage() {
   return (
@@ -11,25 +9,7 @@ export default function RegisterPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
           <p className="text-sm text-muted-foreground">Enter your details to create your account</p>
         </div>
-        <div className="grid gap-6">
-          <form>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" type="text" placeholder="John Doe" required autoComplete="name" />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="name@example.com" required autoComplete="email" />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required autoComplete="new-password" />
-              </div>
-              <Button type="submit">Create account</Button>
-            </div>
-          </form>
-        </div>
+        <RegisterForm/>
         <p className="px-8 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link href="/login" className="underline underline-offset-4 hover:text-primary">

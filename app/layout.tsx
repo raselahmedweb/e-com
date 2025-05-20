@@ -11,7 +11,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "ShopEase - Your One-Stop E-Commerce Shop",
   description: "Shop for electronics, clothing, home goods, and more with fast shipping and secure payments.",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -25,7 +24,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="relative flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 mx-auto">{children}</main>
             <Footer />
           </div>
         </ThemeProvider>
