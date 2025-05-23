@@ -3,9 +3,13 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
-import { sql } from "@neondatabase/serverless"
 import { UpdateOrderStatusForm } from "./update-order-status-form"
+  import { neon } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-http"
 
+// Initialize the SQL client
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql)
 async function getOrder(id: number) {
   const result = await sql`
     SELECT o.*, u.name as customer_name, u.email as customer_email

@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation"
-import { sql } from "@neondatabase/serverless"
 import { ProductForm } from "../../product-form"
+  import { neon } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-http"
+
+// Initialize the SQL client
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql)
 
 async function getProduct(id: number) {
   const result = await sql`SELECT * FROM products WHERE id = ${id}`

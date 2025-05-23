@@ -3,7 +3,11 @@ import { notFound } from "next/navigation"
 import { formatCurrency } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2 } from "lucide-react"
-import { sql } from "@vercel/postgres"
+  import { neon } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-http"
+// Initialize the SQL client
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql)
 
 interface OrderConfirmationPageProps {
   params: {
