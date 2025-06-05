@@ -160,7 +160,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-muted/40 py-12">
+      <section className="py-12">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="flex flex-col items-center text-center space-y-2 p-4">
