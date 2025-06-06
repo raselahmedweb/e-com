@@ -1,11 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { ShoppingCart, User, Menu, Search, X, LogIn } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ShoppingCart, User, Menu, Search, X, LogIn } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { getCurrentUser } from "@/app/auth/actions";
+import { getCategories } from "@/app/admin/actions";
+
+
+type Category = {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string; // Include optional fields from your table schema
+  image_url?: string;
+  created_at?: Date;
+  updated_at?: Date;
+};
 
 // Mock data for preview
 const categories = [
@@ -13,12 +26,47 @@ const categories = [
   { id: 2, name: "Clothing", slug: "clothing" },
   { id: 3, name: "Home & Kitchen", slug: "home" },
   { id: 4, name: "Beauty", slug: "beauty" },
-]
+];
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+};
+
 
 export function Header() {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const cartItemsCount = 2 // Mock cart count
-  const user = null // Mock user (not logged in)
+  const [user, setUser] = useState<User | null>(null);
+  const [categories, setCategories] = useState<any>();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const cartItemsCount = 2; // Mock cart count
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+        setUser(null);
+      }
+    }
+    fetchUser();
+  }, []);
+
+   useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const currentCategories = await getCategories();
+        setCategories(currentCategories);
+      } catch (error) {
+        console.error("Failed to fetch Categories:", error);
+        setCategories(null);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background shadow-sm">
@@ -29,10 +77,13 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
+            <Link
+              href="/"
+              className="text-sm font-medium transition-colors hover:text-primary"
+            >
               Home
             </Link>
-            {categories.map((category) => (
+            {categories && categories.map((category : Category) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
@@ -53,13 +104,23 @@ export function Header() {
                 className="w-full md:w-[200px] lg:w-[300px]"
                 autoFocus
               />
-              <Button variant="ghost" size="icon" className="ml-2" onClick={() => setIsSearchOpen(false)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-2"
+                onClick={() => setIsSearchOpen(false)}
+              >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close search</span>
               </Button>
             </div>
           ) : (
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)} className="hidden md:flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(true)}
+              className="hidden md:flex"
+            >
               <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>
             </Button>
@@ -78,10 +139,12 @@ export function Header() {
           </Link>
 
           {user ? (
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-              <span className="sr-only">Account</span>
-            </Button>
+            <Link href={user.isAdmin ? "/admin" : "/account"}>
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Account</span>
+              </Button>
+            </Link>
           ) : (
             <Link href="/login">
               <Button variant="ghost" size="icon">
@@ -100,10 +163,13 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left">
               <div className="grid gap-6 py-6">
-                <Link href="/" className="text-base font-medium transition-colors hover:text-primary">
+                <Link
+                  href="/"
+                  className="text-base font-medium transition-colors hover:text-primary"
+                >
                   Home
                 </Link>
-                {categories.map((category) => (
+                {categories && categories.map((category: Category) => (
                   <Link
                     key={category.id}
                     href={`/categories/${category.slug}`}
@@ -121,5 +187,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -46,6 +46,7 @@ export function CategoryForm({ category }: CategoryFormProps) {
   }
 
   const onSubmit = async (data: CategoryFormValues) => {
+    console.log(data)
     try {
       setIsSubmitting(true)
       if (category) {
