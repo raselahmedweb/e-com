@@ -1,51 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ProductCard } from "@/components/ui/product-card";
 import Link from "next/link";
 import Categories from "@/components/categories/categories";
-
-
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Wireless Headphones",
-    slug: "wireless-headphones",
-    price: 99.99,
-    sale_price: 79.99,
-    image_url: "/placeholder.svg?height=300&width=300&text=Headphones",
-    category_name: "Electronics",
-    category_slug: "electronics",
-  },
-  {
-    id: 2,
-    name: "Smart Watch",
-    slug: "smart-watch",
-    price: 199.99,
-    sale_price: null,
-    image_url: "/placeholder.svg?height=300&width=300&text=Watch",
-    category_name: "Electronics",
-    category_slug: "electronics",
-  },
-  {
-    id: 3,
-    name: "Cotton T-Shirt",
-    slug: "cotton-tshirt",
-    price: 29.99,
-    sale_price: 19.99,
-    image_url: "/placeholder.svg?height=300&width=300&text=T-Shirt",
-    category_name: "Clothing",
-    category_slug: "clothing",
-  },
-  {
-    id: 4,
-    name: "Coffee Maker",
-    slug: "coffee-maker",
-    price: 89.99,
-    sale_price: null,
-    image_url: "/placeholder.svg?height=300&width=300&text=Coffee+Maker",
-    category_name: "Home & Kitchen",
-    category_slug: "home",
-  },
-];
+import Featured from "@/components/featured/featured";
 
 export default function Home() {
   return (
@@ -122,11 +78,7 @@ export default function Home() {
             Discover our most popular products
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <Featured/>
         <div className="flex justify-center mt-10">
           <Link href="/products">
             <Button variant="outline" size="lg">

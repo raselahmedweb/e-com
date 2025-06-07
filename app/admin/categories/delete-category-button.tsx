@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,31 +12,37 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { deleteCategory } from "../actions"
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 interface DeleteCategoryButtonProps {
-  id: number
-  name: string
-  productCount: number
+  id: number;
+  name: string;
+  productCount: number;
 }
 
-export function DeleteCategoryButton({ id, name, productCount }: DeleteCategoryButtonProps) {
-  const router = useRouter()
-  const [isDeleting, setIsDeleting] = useState(false)
+export function DeleteCategoryButton({
+  id,
+  name,
+  productCount,
+}: DeleteCategoryButtonProps) {
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     try {
-      setIsDeleting(true)
-      await deleteCategory(id)
-      router.refresh()
+      setIsDeleting(true);
+      await fetch("/api/categories", {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+      });
+      router.refresh();
     } catch (error) {
-      console.error("Failed to delete category:", error)
+      console.error("Failed to delete category:", error);
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   return (
     <AlertDialog>
@@ -49,21 +55,26 @@ export function DeleteCategoryButton({ id, name, productCount }: DeleteCategoryB
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the category &quot;{name}&quot;. This action cannot be undone.
+            This will permanently delete the category &quot;{name}&quot;. This
+            action cannot be undone.
             {productCount > 0 && (
               <p className="mt-2 font-semibold text-destructive">
-                This category has {productCount} products. You must reassign or delete these products first.
+                This category has {productCount} products. You must reassign or
+                delete these products first.
               </p>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting || productCount > 0}>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={isDeleting || productCount > 0}
+          >
             {isDeleting ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

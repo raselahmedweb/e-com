@@ -1,14 +1,9 @@
+import { Category } from "@/lib/types"
 import Image from "next/image"
 import Link from "next/link"
 
 interface CategoryCardProps {
-  category: {
-    id: number
-    name: string
-    slug: string
-    image_url: string
-    description?: string
-  }
+  category: Category
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {

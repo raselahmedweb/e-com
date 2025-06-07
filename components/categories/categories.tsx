@@ -1,37 +1,31 @@
 "use client";
 
-import { fetchCategories } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { CategoryCard } from "../ui/category-card";
+import { Category } from "@/lib/types";
 
-type Category = {
-  id: number;
-  name: string;
-  slug: string;
-  description?: string;
-  image_url?: string;
-  created_at?: Date;
-  updated_at?: Date;
-};
 export default function Categories() {
-  const [categories, setCategories] = useState([]);
-  useEffect(() => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  useEffect(()=>{
     async function cate() {
       try {
-        const currentCategories = await fetchCategories();
-        console.log(currentCategories)
-        setCategories(currentCategories);
+        const res = (await fetch("/api/categories"))
+        const data = res.json();
+        const currentCategories = await data;
+        setCategories(currentCategories)
       } catch (error) {
-        console.error("Cant fetch categories", error)
-        setCategories([])
+        console.error("Can't fetch categories", error);
       }
     }
     cate();
-  }, []);
-  return <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-          {categories &&
-            categories.map((category) => (
-              <CategoryCard key={category?.id} category={category} />
-            ))}
-        </div>;
+  },[])
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+      {categories &&
+        categories.map((category) => (
+          <CategoryCard key={category?.id} category={category} />
+        ))}
+    </div>
+  );
 }

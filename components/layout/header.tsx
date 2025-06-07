@@ -7,30 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { getCurrentUser } from "@/app/auth/actions";
-import { getCategories } from "@/app/admin/actions";
-
-
-type Category = {
-  id: number;
-  name: string;
-  slug: string;
-  description?: string;
-  image_url?: string;
-  created_at?: Date;
-  updated_at?: Date;
-};
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  isAdmin: boolean;
-};
+import { Category, UserT } from "@/lib/types";
 
 
 export function Header() {
-  const [user, setUser] = useState<User | null>(null);
-  const [categories, setCategories] = useState<any>();
+  const [user, setUser] = useState<UserT | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const cartItemsCount = 2; // Mock cart count
 
@@ -47,18 +28,20 @@ export function Header() {
     fetchUser();
   }, []);
 
-   useEffect(() => {
-    async function fetchCategories() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  useEffect(()=>{
+    async function cate() {
       try {
-        const currentCategories = await getCategories();
-        setCategories(currentCategories);
+        const res = (await fetch("/api/categories"))
+        const data = res.json();
+        const currentCategories = await data;
+        setCategories(currentCategories)
       } catch (error) {
-        console.error("Failed to fetch Categories:", error);
-        setCategories(null);
+        console.error("Can't fetch categories", error);
       }
     }
-    fetchCategories();
-  }, []);
+    cate();
+  },[])
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background shadow-sm">

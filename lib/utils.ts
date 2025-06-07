@@ -1,4 +1,3 @@
-import { getCategories } from "@/app/admin/actions";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -25,14 +24,4 @@ export function generateSlug(text: string): string {
 export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + "...";
-}
-
-export async function fetchCategories() {
-  try {
-    const currentCategories = await getCategories();
-    return currentCategories;
-  } catch (error) {
-    console.error("Failed to fetch Categories:", error);
-    return null;
-  }
 }

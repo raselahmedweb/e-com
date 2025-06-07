@@ -94,43 +94,7 @@ export async function createCategory(data: any) {
   // revalidatePath("/categories");
 }
 
-export async function updateCategory(id: number, data: any) {
-  await checkAdmin();
 
-  await sql`
-    UPDATE categories
-    SET 
-      name = ${data.name},
-      slug = ${data.slug},
-      description = ${data.description},
-      image_url = ${data.image_url},
-      updated_at = NOW()
-    WHERE id = ${id}
-  `;
-
-  // revalidatePath("/admin/categories");
-  // revalidatePath("/");
-  // revalidatePath("/categories");
-  // revalidatePath(`/categories/${data.slug}`);
-}
-
-export async function deleteCategory(id: number) {
-  await checkAdmin();
-
-  // Check if category has products
-  const products =
-    await sql`SELECT COUNT(*) FROM products WHERE category_id = ${id}`;
-
-  if (Number.parseInt(products[0].count) > 0) {
-    throw new Error("Cannot delete category with products");
-  }
-
-  await sql`DELETE FROM categories WHERE id = ${id}`;
-
-  // revalidatePath("/admin/categories");
-  // revalidatePath("/");
-  // revalidatePath("/categories");
-}
 
 // Order actions
 export async function updateOrderStatus(id: number, status: string) {

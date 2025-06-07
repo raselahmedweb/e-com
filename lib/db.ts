@@ -1,40 +1,74 @@
-import { neon } from "@neondatabase/serverless"
-import { drizzle } from "drizzle-orm/neon-http"
-import { cookies } from "next/headers"
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+import { cookies } from "next/headers";
 
 // Initialize the SQL client
-const sql = neon(process.env.DATABASE_URL!)
-export const db = drizzle(sql)
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql);
 
 // Replace the executeQuery function with this updated version
 export async function executeQuery(query: string, params: any[] = []) {
   try {
     // Convert the query and params to a tagged template string
     // This is a workaround since we can't directly use tagged templates with dynamic queries
-    let preparedQuery = query
-    const values = [...params]
+    let preparedQuery = query;
+    const values = [...params];
 
     // Replace $1, $2, etc. with ? for the sql tagged template
     for (let i = 0; i < values.length; i++) {
-      preparedQuery = preparedQuery.replace(`$${i + 1}`, "?")
+      preparedQuery = preparedQuery.replace(`$${i + 1}`, "?");
     }
 
     // Use the sql tagged template function
-    return await sql.unsafe(preparedQuery)
+    return await sql.unsafe(preparedQuery);
   } catch (error) {
-    console.error("Database query error:", error)
-    throw error
+    console.error("Database query error:", error);
+    throw error;
   }
 }
 
 // Alternatively, we can use the direct approach for specific queries
 // For example, replace getCategories with:
 export async function getCategories() {
-  return sql`SELECT * FROM categories ORDER BY name`
+  return sql`SELECT * FROM categories ORDER BY name`;
+}
+
+export async function updateCategory(id: number, data: any) {
+  await sql`
+    UPDATE categories
+    SET 
+      name = ${data.name},
+      slug = ${data.slug},
+      description = ${data.description},
+      image_url = ${data.image_url},
+      updated_at = NOW()
+    WHERE id = ${id}
+  `;
+}
+
+export async function createCategory(data: any) {
+  await sql`
+    INSERT INTO categories (name, slug, description, image_url, created_at, updated_at)
+    VALUES (${data.name}, ${data.slug}, ${data.description}, ${data.image_url}, NOW(), NOW())
+  `;
+}
+
+export async function deleteCategory(id: number) {
+  // Check if category has products
+  const products =
+    await sql`SELECT COUNT(*) FROM products WHERE category_id = ${id}`;
+
+  if (Number.parseInt(products[0].count) > 0) {
+    throw new Error("Cannot delete category with products");
+  }
+
+  await sql`DELETE FROM categories WHERE id = ${id}`;
 }
 
 export async function getCategoryBySlug(slug: string) {
-  return sql`SELECT * FROM categories WHERE slug = ${slug}`.then((results) => results[0] || null)
+  return sql`SELECT * FROM categories WHERE slug = ${slug}`.then(
+    (results) => results[0] || null
+  );
 }
 
 // Products
@@ -46,7 +80,7 @@ export async function getFeaturedProducts() {
     WHERE p.featured = true
     ORDER BY p.created_at DESC
     LIMIT 8
-  `
+  `;
 }
 
 export async function getProductsByCategory(categoryId: number) {
@@ -56,7 +90,7 @@ export async function getProductsByCategory(categoryId: number) {
     JOIN categories c ON p.category_id = c.id
     WHERE p.category_id = ${categoryId}
     ORDER BY p.name
-  `
+  `;
 }
 
 export async function getProductBySlug(slug: string) {
@@ -65,14 +99,21 @@ export async function getProductBySlug(slug: string) {
     FROM products p
     JOIN categories c ON p.category_id = c.id
     WHERE p.slug = ${slug}
-  `.then((results) => results[0] || null)
+  `.then((results) => results[0] || null);
+}
+
+export async function getProduct() {
+  return sql`
+    SELECT * 
+    FROM products
+  `;
 }
 
 // Cart
 export async function getCart(sessionId: string) {
   const cart = await sql`
     SELECT * FROM cart WHERE session_id = ${sessionId}
-  `
+  `;
 
   if (cart.length === 0) {
     // Create a new cart if it doesn't exist
@@ -80,11 +121,11 @@ export async function getCart(sessionId: string) {
       INSERT INTO cart (session_id, created_at, updated_at)
       VALUES (${sessionId}, NOW(), NOW())
       RETURNING *
-    `
-    return newCart[0]
+    `;
+    return newCart[0];
   }
 
-  return cart[0]
+  return cart[0];
 }
 
 export async function getCartItems(cartId: number) {
@@ -93,14 +134,18 @@ export async function getCartItems(cartId: number) {
     FROM cart_items ci
     JOIN products p ON ci.product_id = p.id
     WHERE ci.cart_id = ${cartId}
-  `
+  `;
 }
 
-export async function addToCart(cartId: number, productId: number, quantity: number) {
+export async function addToCart(
+  cartId: number,
+  productId: number,
+  quantity: number
+) {
   // Check if item already exists in cart
   const existingItem = await sql`
     SELECT * FROM cart_items WHERE cart_id = ${cartId} AND product_id = ${productId}
-  `
+  `;
 
   if (existingItem.length > 0) {
     // Update quantity if item exists
@@ -109,14 +154,14 @@ export async function addToCart(cartId: number, productId: number, quantity: num
       SET quantity = quantity + ${quantity}, updated_at = NOW()
       WHERE cart_id = ${cartId} AND product_id = ${productId}
       RETURNING *
-    `
+    `;
   } else {
     // Add new item if it doesn't exist
     return sql`
       INSERT INTO cart_items (cart_id, product_id, quantity, created_at, updated_at)
       VALUES (${cartId}, ${productId}, ${quantity}, NOW(), NOW())
       RETURNING *
-    `
+    `;
   }
 }
 
@@ -126,14 +171,14 @@ export async function updateCartItem(cartItemId: number, quantity: number) {
     SET quantity = ${quantity}, updated_at = NOW()
     WHERE id = ${cartItemId}
     RETURNING *
-  `
+  `;
 }
 
 export async function removeCartItem(cartItemId: number) {
   return sql`
     DELETE FROM cart_items
     WHERE id = ${cartItemId}
-  `
+  `;
 }
 
 // Orders
@@ -142,7 +187,7 @@ export async function createOrder(
   totalAmount: number,
   paymentMethod: string,
   shippingAddress: string,
-  contactPhone: string,
+  contactPhone: string
 ) {
   const order = await sql`
     INSERT INTO orders (
@@ -161,9 +206,9 @@ export async function createOrder(
       NOW()
     )
     RETURNING *
-  `
+  `;
 
-  return order[0]
+  return order[0];
 }
 
 export async function addOrderItems(orderId: number, cartItems: any[]) {
@@ -171,10 +216,10 @@ export async function addOrderItems(orderId: number, cartItems: any[]) {
     return sql`
       INSERT INTO order_items (order_id, product_id, quantity, price, created_at)
       VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price}, NOW())
-    `
-  })
+    `;
+  });
 
-  await Promise.all(promises)
+  await Promise.all(promises);
 }
 
 export async function updateOrderStatus(orderId: number, status: string) {
@@ -183,7 +228,7 @@ export async function updateOrderStatus(orderId: number, status: string) {
     SET status = ${status}, updated_at = NOW()
     WHERE id = ${orderId}
     RETURNING *
-  `
+  `;
 }
 
 export async function updatePaymentStatus(orderId: number, status: string) {
@@ -192,23 +237,27 @@ export async function updatePaymentStatus(orderId: number, status: string) {
     SET payment_status = ${status}, updated_at = NOW()
     WHERE id = ${orderId}
     RETURNING *
-  `
+  `;
 }
 
 // Users
 export async function getUserByEmail(email: string) {
-  const results = await sql`SELECT * FROM users WHERE email = ${email}`
-  return results[0] || null
+  const results = await sql`SELECT * FROM users WHERE email = ${email}`;
+  return results[0] || null;
 }
 
-export async function createUser(name: string, email: string, passwordHash: string) {
+export async function createUser(
+  name: string,
+  email: string,
+  passwordHash: string
+) {
   const user = await sql`
     INSERT INTO users (name, email, password_hash, created_at, updated_at)
     VALUES (${name}, ${email}, ${passwordHash}, NOW(), NOW())
     RETURNING *
-  `
+  `;
 
-  return user[0]
+  return user[0];
 }
 
 // Get user orders
@@ -218,21 +267,25 @@ export async function getUserOrders(userId: number) {
       SELECT * FROM orders 
       WHERE user_id = ${userId}
       ORDER BY created_at DESC
-    `
+    `;
   } catch (error) {
-    console.error("Error fetching user orders:", error)
-    return []
+    console.error("Error fetching user orders:", error);
+    return [];
   }
 }
 
 // Update user profile
-export async function updateUserProfile(userId: number, name: string, email: string) {
+export async function updateUserProfile(
+  userId: number,
+  name: string,
+  email: string
+) {
   return sql`
     UPDATE users
     SET name = ${name}, email = ${email}, updated_at = NOW()
     WHERE id = ${userId}
     RETURNING *
-  `
+  `;
 }
 
 // Add user address
@@ -243,7 +296,7 @@ export async function addUserAddress(
   state: string,
   postalCode: string,
   country: string,
-  isDefault: boolean,
+  isDefault: boolean
 ) {
   // This would require a new addresses table in your database
   // For now, we'll just update the user's address field
@@ -252,12 +305,14 @@ export async function addUserAddress(
     SET address = ${address}, updated_at = NOW()
     WHERE id = ${userId}
     RETURNING *
-  `
+  `;
 }
 
 function generateSessionId(): string {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 }
 
 // Get or create session ID
@@ -265,24 +320,24 @@ export async function getSessionId() {
   try {
     // Get the cookie store
     const cookieStore = await cookies();
-    
+
     // Try to get existing session ID
-    const existingCookie = cookieStore.get('sessionId');
+    const existingCookie = cookieStore.get("sessionId");
     const sessionId = existingCookie?.value;
 
     if (!sessionId) {
       // Generate new session ID
       const newSessionId = generateSessionId();
-      
+
       // Set the new cookie
-      cookieStore.set('sessionId', newSessionId, {
+      cookieStore.set("sessionId", newSessionId, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
         maxAge: 60 * 60 * 24 * 30, // 30 days
-        path: '/',
-        sameSite: 'lax'
+        path: "/",
+        sameSite: "lax",
       });
-      
+
       return newSessionId;
     }
 
