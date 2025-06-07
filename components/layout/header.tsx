@@ -14,19 +14,11 @@ type Category = {
   id: number;
   name: string;
   slug: string;
-  description?: string; // Include optional fields from your table schema
+  description?: string;
   image_url?: string;
   created_at?: Date;
   updated_at?: Date;
 };
-
-// Mock data for preview
-const categories = [
-  { id: 1, name: "Electronics", slug: "electronics" },
-  { id: 2, name: "Clothing", slug: "clothing" },
-  { id: 3, name: "Home & Kitchen", slug: "home" },
-  { id: 4, name: "Beauty", slug: "beauty" },
-];
 
 type User = {
   id: number;

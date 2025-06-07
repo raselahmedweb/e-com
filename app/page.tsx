@@ -1,39 +1,8 @@
-import { Button } from "@/components/ui/button"
-import { ProductCard } from "@/components/ui/product-card"
-import { CategoryCard } from "@/components/ui/category-card"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import { ProductCard } from "@/components/ui/product-card";
+import Link from "next/link";
+import Categories from "@/components/categories/categories";
 
-// Mock data for preview purposes
-const categories = [
-  {
-    id: 1,
-    name: "Electronics",
-    slug: "electronics",
-    image_url: "/placeholder.svg?height=300&width=400&text=Electronics",
-    description: "Latest gadgets and electronic devices",
-  },
-  {
-    id: 2,
-    name: "Clothing",
-    slug: "clothing",
-    image_url: "/placeholder.svg?height=300&width=400&text=Clothing",
-    description: "Trendy fashion for all seasons",
-  },
-  {
-    id: 3,
-    name: "Home & Kitchen",
-    slug: "home",
-    image_url: "/placeholder.svg?height=300&width=400&text=Home",
-    description: "Everything for your home and kitchen",
-  },
-  {
-    id: 4,
-    name: "Beauty",
-    slug: "beauty",
-    image_url: "/placeholder.svg?height=300&width=400&text=Beauty",
-    description: "Beauty and personal care products",
-  },
-]
 
 const featuredProducts = [
   {
@@ -76,7 +45,7 @@ const featuredProducts = [
     category_name: "Home & Kitchen",
     category_slug: "home",
   },
-]
+];
 
 export default function Home() {
   return (
@@ -91,8 +60,8 @@ export default function Home() {
                   Shop with Confidence
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  Discover quality products at competitive prices. Fast shipping, secure payments, and excellent
-                  customer service.
+                  Discover quality products at competitive prices. Fast
+                  shipping, secure payments, and excellent customer service.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -111,8 +80,12 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg opacity-80"></div>
                 <div className="absolute inset-0 flex items-center justify-center text-white text-center p-6">
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-4">Summer Sale</h2>
-                    <p className="text-lg md:text-xl mb-6">Up to 50% off on selected items</p>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                      Summer Sale
+                    </h2>
+                    <p className="text-lg md:text-xl mb-6">
+                      Up to 50% off on selected items
+                    </p>
                     <Link href="/sale">
                       <Button variant="secondary" size="lg">
                         View Offers
@@ -129,21 +102,25 @@ export default function Home() {
       {/* Categories Section */}
       <section className="container px-4 md:px-6 py-6">
         <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-bold tracking-tight">Shop by Category</h2>
-          <p className="text-muted-foreground">Browse our wide selection of products by category</p>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Shop by Category
+          </h2>
+          <p className="text-muted-foreground">
+            Browse our wide selection of products by category
+          </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-          {categories.map((category) => (
-            <CategoryCard key={category.id} category={category} />
-          ))}
-        </div>
+        <Categories/>
       </section>
 
       {/* Featured Products Section */}
       <section className="container px-4 md:px-6 py-6">
         <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-bold tracking-tight">Featured Products</h2>
-          <p className="text-muted-foreground">Discover our most popular products</p>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Featured Products
+          </h2>
+          <p className="text-muted-foreground">
+            Discover our most popular products
+          </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
           {featuredProducts.map((product) => (
@@ -182,7 +159,9 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold">Free Shipping</h3>
-              <p className="text-muted-foreground">Free shipping on all orders over $50</p>
+              <p className="text-muted-foreground">
+                Free shipping on all orders over $50
+              </p>
             </div>
             <div className="flex flex-col items-center text-center space-y-2 p-4">
               <div className="rounded-full bg-primary/10 p-3">
@@ -202,7 +181,9 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold">Secure Payments</h3>
-              <p className="text-muted-foreground">We use secure payment methods for your peace of mind</p>
+              <p className="text-muted-foreground">
+                We use secure payment methods for your peace of mind
+              </p>
             </div>
             <div className="flex flex-col items-center text-center space-y-2 p-4">
               <div className="rounded-full bg-primary/10 p-3">
@@ -222,11 +203,13 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold">Easy Returns</h3>
-              <p className="text-muted-foreground">30-day return policy for all products</p>
+              <p className="text-muted-foreground">
+                30-day return policy for all products
+              </p>
             </div>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }
