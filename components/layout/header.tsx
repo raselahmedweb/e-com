@@ -9,11 +9,10 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { getCurrentUser } from "@/app/auth/actions";
 import { Category, UserT } from "@/lib/types";
 
-
 export function Header() {
   const [user, setUser] = useState<UserT | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const cartItemsCount = 2; // Mock cart count
+  const [cartItemsCount, setCartItemsCount] = useState<number>(0); // Mock cart count
 
   useEffect(() => {
     async function fetchUser() {
@@ -26,22 +25,30 @@ export function Header() {
       }
     }
     fetchUser();
-  }, []);
+    const existingCart = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("cart="))
+      ?.split("=")[1];
+    const cartData = JSON.parse(existingCart);
+    setCartItemsCount(cartData.items.length);
+  }, [cartItemsCount]);
+
+
 
   const [categories, setCategories] = useState<Category[]>([]);
-  useEffect(()=>{
+  useEffect(() => {
     async function cate() {
       try {
-        const res = (await fetch("/api/categories"))
+        const res = await fetch("/api/categories");
         const data = res.json();
         const currentCategories = await data;
-        setCategories(currentCategories)
+        setCategories(currentCategories);
       } catch (error) {
         console.error("Can't fetch categories", error);
       }
     }
     cate();
-  },[])
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background shadow-sm">
@@ -58,15 +65,16 @@ export function Header() {
             >
               Home
             </Link>
-            {categories && categories.map((category : Category) => (
-              <Link
-                key={category.id}
-                href={`/categories/${category.slug}`}
-                className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
-              >
-                {category.name}
-              </Link>
-            ))}
+            {categories &&
+              categories.map((category: Category) => (
+                <Link
+                  key={category.id}
+                  href={`/categories/${category.slug}`}
+                  className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
+                >
+                  {category.name}
+                </Link>
+              ))}
           </nav>
         </div>
 
@@ -144,15 +152,16 @@ export function Header() {
                 >
                   Home
                 </Link>
-                {categories && categories.map((category: Category) => (
-                  <Link
-                    key={category.id}
-                    href={`/categories/${category.slug}`}
-                    className="text-base font-medium transition-colors hover:text-primary"
-                  >
-                    {category.name}
-                  </Link>
-                ))}
+                {categories &&
+                  categories.map((category: Category) => (
+                    <Link
+                      key={category.id}
+                      href={`/categories/${category.slug}`}
+                      className="text-base font-medium transition-colors hover:text-primary"
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
                 <div className="pt-4">
                   <Input type="search" placeholder="Search products..." />
                 </div>

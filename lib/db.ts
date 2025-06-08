@@ -101,6 +101,17 @@ export async function getProductBySlug(slug: string) {
     WHERE p.slug = ${slug}
   `.then((results) => results[0] || null);
 }
+export async function getProductById(ids: number[]) {
+  if (!ids.length) return [];
+
+  return await sql`
+    SELECT p.*, c.name as category_name, c.slug as category_slug
+    FROM products p
+    JOIN categories c ON p.category_id = c.id
+    WHERE p.id = ANY (${ids})
+  `;
+
+}
 
 export async function getProduct() {
   return sql`

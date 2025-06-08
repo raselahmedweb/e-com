@@ -3,7 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart } from "lucide-react"
-import { addToCart } from "@/lib/db"
+
 
 // Mock product data for preview
 const product = {

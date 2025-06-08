@@ -1,5 +1,9 @@
+"use client"
 import Image from "next/image"
 import Link from "next/link"
+import { Button } from "./button"
+import { ShoppingCart } from "lucide-react"
+import { handleAddToCart } from "@/utility/add_to_cart"
 
 interface ProductCardProps {
   product: {
@@ -15,7 +19,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { name, slug, price, sale_price, image_url, category_name, category_slug } = product
+  const { name, slug, price, sale_price, image_url, category_name, category_slug, id } = product
   const discountPercentage = sale_price ? Math.round((1 - sale_price / price) * 100) : 0
 
   // Format currency
@@ -28,7 +32,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="group relative overflow-hidden rounded-lg border bg-background transition-all hover:shadow-md">
-      <Link href={`/products/${slug}`} className="block h-full w-full">
+      <div className="block h-full w-full">
+        <Link href={`/products/${slug}`}>
         <div className="relative aspect-square overflow-hidden">
           <Image
             src={image_url || "/placeholder.svg?height=300&width=300"}
@@ -42,6 +47,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
         </div>
+        </Link>
         <div className="p-4">
           <div className="mb-1 text-sm text-muted-foreground">
             <Link href={`/categories/${category_slug}`} className="hover:underline">
@@ -59,8 +65,14 @@ export function ProductCard({ product }: ProductCardProps) {
               <span className="font-medium text-primary">{formatCurrency(price)}</span>
             )}
           </div>
+          <div className="mt-2 flex items-center gap-2">
+           <Button onClick={()=>handleAddToCart(id, 1)} className="w-full">
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Add to Cart
+            </Button> 
+          </div>
         </div>
-      </Link>
+      </div>
     </div>
   )
 }
