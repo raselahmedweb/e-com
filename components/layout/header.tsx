@@ -29,8 +29,10 @@ export function Header() {
       .split("; ")
       .find((row) => row.startsWith("cart="))
       ?.split("=")[1];
-    const cartData = JSON.parse(existingCart);
+    if(existingCart){
+      const cartData = JSON.parse(existingCart);
     setCartItemsCount(cartData.items.length);
+    }
   }, [cartItemsCount]);
 
 

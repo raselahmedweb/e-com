@@ -14,30 +14,57 @@ const formatCurrency = (amount: number) => {
 };
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState([]);
+ const [cartItems, setCartItems] = useState([]);
 
-  useEffect(() => {
-    async function fetchProduct() {
+useEffect(() => {
+  async function fetchProduct() {
+    try {
+      // Parse cart from cookie
       const existingCart = document.cookie
         .split("; ")
         .find((row) => row.startsWith("cart="))
         ?.split("=")[1];
-      const items = JSON.parse(existingCart).items;
-      const params = new URLSearchParams();
+      if (!existingCart) {
+        console.log("No cart found in cookies");
+        return;
+      }
 
+     
+
+      const items = JSON.parse(existingCart).items;
+      if (!items || !items.length) {
+        console.log("No items in cart");
+        return;
+      }
+
+      // Build query parameters
+      const params = new URLSearchParams();
       items.forEach((item) => {
         params.append("product_id", item.product_id.toString());
       });
 
-      const res = (await fetch(`/api/product?${params.toString()}`)).json();
-      setCartItems(await res);
+      // Fetch products from API
+      const res = await (await fetch(`/api/product?${params.toString()}`)).json();
+
+      // Merge quantity from items into res based on product_id and id
+      const mergedItems = res.map((product) => ({
+        ...product,
+        quantity: items.find((item) => item.product_id === product.id)?.quantity || 0
+      }));
+
+      // Update state with merged items
+      setCartItems(mergedItems);
+    } catch (error) {
+      console.error("Error fetching or processing cart items:", error);
     }
-    fetchProduct();
-  }, []);
+  }
+
+  fetchProduct();
+}, []);
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.sale_price * item.quantity,
-    0
-  );
+  (sum, item) => sum + (item.sale_price ? item.sale_price : item.price) * item.quantity,
+  0
+);
   const shipping = subtotal > 50 ? 0 : 5.99;
   const total = subtotal + shipping;
   return (
@@ -75,11 +102,11 @@ export default function CartPage() {
                               </Link>
                             </h3>
                             <p className="mt-1 text-sm text-muted-foreground">
-                              {formatCurrency(item.price)} each
+                              {formatCurrency(item.sale_price ? item.sale_price : item.price)} each
                             </p>
                           </div>
                           <p className="text-sm font-medium">
-                            {formatCurrency(item.price * item.quantity)}
+                            {formatCurrency((item.sale_price ? item.sale_price : item.price) * item.quantity)}
                           </p>
                         </div>
                         <div className="mt-auto flex items-end justify-between text-sm">
